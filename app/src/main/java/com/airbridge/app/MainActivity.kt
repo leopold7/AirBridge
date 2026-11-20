@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -143,6 +141,7 @@ private fun App(onConnect: (AirplayDevice) -> Unit) {
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -154,10 +153,10 @@ private fun App(onConnect: (AirplayDevice) -> Unit) {
                         onVolume = { CastController.setVolume(it) },
                         onStop = { CastController.stop(context) }
                     )
-                    LogPanel(ui.logs, modifier = Modifier.weight(1f))
+                    LogPanel(ui.logs)
                 } else {
-                    DeviceList(ui, onConnect, onDelete = { CastController.removeManual(it) }, modifier = Modifier.weight(1f))
-                    LogPanel(ui.logs, modifier = Modifier.height(140.dp))
+                    DeviceList(ui, onConnect, onDelete = { CastController.removeManual(it) })
+                    LogPanel(ui.logs)
                 }
             }
         }
@@ -276,11 +275,11 @@ private fun DeviceList(
         )
         return
     }
-    LazyColumn(
+    Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
     ) {
-        items(ui.devices, key = { "${it.type}|${it.name}|${it.host}:${it.port}" }) { d ->
+        ui.devices.forEach { d ->
             Card {
                 Row(
                     modifier = Modifier
@@ -352,7 +351,8 @@ private fun LogPanel(logs: List<String>, modifier: Modifier = Modifier) {
     Card(modifier = modifier) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .height(180.dp)
                 .padding(horizontal = 12.dp, vertical = 6.dp)
         ) {
             Row(
@@ -371,7 +371,6 @@ private fun LogPanel(logs: List<String>, modifier: Modifier = Modifier) {
                 fontFamily = FontFamily.Monospace,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
                     .verticalScroll(scrollState)
                     .padding(bottom = 6.dp)
             )
